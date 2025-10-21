@@ -1,0 +1,26 @@
+package org.smartgarden.backend.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.smartgarden.backend.dto.ThresholdDtos;
+import org.smartgarden.backend.entity.Threshold;
+import org.smartgarden.backend.service.ThresholdService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/thresholds")
+@RequiredArgsConstructor
+public class ThresholdController {
+    private final ThresholdService thresholdService;
+
+    @PutMapping("/{gardenId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Threshold> update(@PathVariable Long gardenId, @Valid @RequestBody ThresholdDtos.ThresholdRequest req) {
+        req.setGardenId(gardenId);
+        return ResponseEntity.ok(thresholdService.upsertThreshold(req));
+    }
+}
+
+
