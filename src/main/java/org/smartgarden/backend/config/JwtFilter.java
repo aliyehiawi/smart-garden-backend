@@ -30,36 +30,45 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     FilterChain filterChain)
+            throws ServletException, IOException {
         String path = request.getRequestURI();
-        if (path.startsWith("/api/v1/auth/") || 
-            path.startsWith("/api/v1/devices/") || 
-            path.startsWith("/h2-console") ||
-            path.startsWith("/swagger-ui") ||
-            path.startsWith("/v3/api-docs")) {
+        if (path.startsWith("/api/v1/auth/")
+                || path.startsWith("/api/v1/devices/")
+                || path.startsWith("/h2-console")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            try {
-                Jws<Claims> jws = jwtUtil.parseToken(token);
-                String username = jws.getBody().getSubject();
-                String role = (String) jws.getBody().get("role");
-                if (username != null && role != null && userRepository.findByUsername(username).isPresent()) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            } catch (Exception ignored) {
-            }
+            processJwtToken(header);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void processJwtToken(String header) {
+        String token = header.substring(7);
+        try {
+            Jws<Claims> jws = jwtUtil.parseToken(token);
+            String username = jws.getBody().getSubject();
+            String role = (String) jws.getBody().get("role");
+            if (username != null && role != null 
+                    && userRepository.findByUsername(username).isPresent()) {
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception ignored) {
+            // Invalid token - authentication will remain null
+        }
     }
 }
 

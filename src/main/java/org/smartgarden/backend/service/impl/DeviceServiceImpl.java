@@ -26,6 +26,7 @@ public class DeviceServiceImpl implements DeviceService {
     private final GardenRepository gardenRepository;
     private final DeviceCommandRepository deviceCommandRepository;
     private final DeviceMapper deviceMapper;
+    private final SecureRandom secureRandom;
 
     public DeviceServiceImpl(DeviceRepository deviceRepository,
                              GardenRepository gardenRepository,
@@ -35,6 +36,7 @@ public class DeviceServiceImpl implements DeviceService {
         this.gardenRepository = gardenRepository;
         this.deviceCommandRepository = deviceCommandRepository;
         this.deviceMapper = deviceMapper;
+        this.secureRandom = new SecureRandom();
     }
 
     @Override
@@ -71,7 +73,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     private String generateApiKey() {
         byte[] bytes = new byte[16];
-        new SecureRandom().nextBytes(bytes);
+        secureRandom.nextBytes(bytes);
         return HexFormat.of().formatHex(bytes);
     }
 }

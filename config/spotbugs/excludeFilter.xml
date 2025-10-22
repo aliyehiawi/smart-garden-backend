@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude Lombok-generated Builder classes -->
+    <Match>
+        <Class name="~.*\$.*Builder"/>
+    </Match>
+    
+    <!-- Exclude entity classes - Lombok generates getters/setters that expose internal representation by design -->
+    <Match>
+        <Package name="~org\.smartgarden\.backend\.entity"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude DTO classes from EI_EXPOSE_REP warnings - DTOs intentionally expose data -->
+    <Match>
+        <Package name="~org\.smartgarden\.backend\.dto"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude MapStruct-generated mapper implementations from EI_EXPOSE_REP warnings -->
+    <Match>
+        <Class name="~.*MapperImpl"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude config classes with constructor injection -->
+    <Match>
+        <Class name="~org\.smartgarden\.backend\.config\.SecurityConfig"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>
+

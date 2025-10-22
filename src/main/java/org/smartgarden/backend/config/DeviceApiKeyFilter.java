@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.smartgarden.backend.entity.Device;
 import org.smartgarden.backend.repository.DeviceRepository;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,10 @@ public class DeviceApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     FilterChain filterChain)
+            throws ServletException, IOException {
         String deviceId = request.getRequestURI().split("/api/v1/devices/")[1].split("/")[0];
         String apiKeyHeader = request.getHeader("X-DEVICE-KEY");
         if (apiKeyHeader == null) {

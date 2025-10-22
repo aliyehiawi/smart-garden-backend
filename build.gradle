@@ -182,6 +182,7 @@ spotbugs {
 	ignoreFailures = true  // Generate reports without failing build
 	effort = 'max'  // Maximum analysis effort
 	reportLevel = 'medium'  // Report medium and high priority bugs
+	excludeFilter = file("${project.rootDir}/config/spotbugs/excludeFilter.xml")
 }
 
 // Generate HTML reports for SpotBugs

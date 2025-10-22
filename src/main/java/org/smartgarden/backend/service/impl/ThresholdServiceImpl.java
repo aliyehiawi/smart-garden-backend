@@ -2,7 +2,10 @@ package org.smartgarden.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.smartgarden.backend.dto.ThresholdDtos;
-import org.smartgarden.backend.entity.*;
+import org.smartgarden.backend.entity.ComparatorType;
+import org.smartgarden.backend.entity.Garden;
+import org.smartgarden.backend.entity.SensorType;
+import org.smartgarden.backend.entity.Threshold;
 import org.smartgarden.backend.exception.NotFoundException;
 import org.smartgarden.backend.repository.GardenRepository;
 import org.smartgarden.backend.repository.ThresholdRepository;

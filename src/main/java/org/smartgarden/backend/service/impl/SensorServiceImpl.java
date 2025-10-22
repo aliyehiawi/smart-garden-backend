@@ -2,9 +2,15 @@ package org.smartgarden.backend.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smartgarden.backend.dto.SensorDtos;
-import org.smartgarden.backend.entity.*;
+import org.smartgarden.backend.entity.ComparatorType;
+import org.smartgarden.backend.entity.Device;
+import org.smartgarden.backend.entity.InitiatedBy;
+import org.smartgarden.backend.entity.SensorData;
+import org.smartgarden.backend.entity.SensorType;
 import org.smartgarden.backend.exception.NotFoundException;
-import org.smartgarden.backend.repository.*;
+import org.smartgarden.backend.repository.DeviceRepository;
+import org.smartgarden.backend.repository.SensorDataRepository;
+import org.smartgarden.backend.repository.ThresholdRepository;
 import org.smartgarden.backend.service.PumpService;
 import org.smartgarden.backend.service.SensorService;
 import org.springframework.stereotype.Service;
