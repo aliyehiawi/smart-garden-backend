@@ -7,7 +7,10 @@ import java.util.Optional;
 
 public interface DeviceRepository extends JpaRepository<Device, Long> {
     Optional<Device> findByDeviceId(String deviceId);
+    
+    // CHECKSTYLE.OFF: MethodName - Spring Data JPA requires underscore for nested property navigation (garden.id)
     java.util.List<Device> findByGarden_Id(Long gardenId);
+    // CHECKSTYLE.ON: MethodName
 }
 
 

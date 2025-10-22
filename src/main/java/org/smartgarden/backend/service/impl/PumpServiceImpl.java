@@ -1,9 +1,21 @@
 package org.smartgarden.backend.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smartgarden.backend.entity.*;
+import org.smartgarden.backend.entity.Device;
+import org.smartgarden.backend.entity.DeviceCommand;
+import org.smartgarden.backend.entity.Garden;
+import org.smartgarden.backend.entity.InitiatedBy;
+import org.smartgarden.backend.entity.PumpAction;
+import org.smartgarden.backend.entity.PumpLog;
+import org.smartgarden.backend.entity.PumpStatus;
+import org.smartgarden.backend.entity.SensorType;
+import org.smartgarden.backend.entity.Threshold;
 import org.smartgarden.backend.exception.NotFoundException;
-import org.smartgarden.backend.repository.*;
+import org.smartgarden.backend.repository.DeviceCommandRepository;
+import org.smartgarden.backend.repository.DeviceRepository;
+import org.smartgarden.backend.repository.GardenRepository;
+import org.smartgarden.backend.repository.PumpLogRepository;
+import org.smartgarden.backend.repository.ThresholdRepository;
 import org.smartgarden.backend.service.PumpService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

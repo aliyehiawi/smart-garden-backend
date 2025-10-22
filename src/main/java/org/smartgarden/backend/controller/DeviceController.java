@@ -7,7 +7,12 @@ import org.smartgarden.backend.entity.DeviceCommand;
 import org.smartgarden.backend.service.DeviceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -29,7 +34,9 @@ public class DeviceController {
     }
 
     @PostMapping("/{deviceId}/commands/{commandId}/ack")
-    public ResponseEntity<Void> ack(@PathVariable String deviceId, @PathVariable Long commandId, @Valid @RequestBody DeviceDtos.AckCommandRequest request) {
+    public ResponseEntity<Void> ack(@PathVariable String deviceId,
+                                     @PathVariable Long commandId,
+                                     @Valid @RequestBody DeviceDtos.AckCommandRequest request) {
         deviceService.acknowledgeCommand(commandId, request.getDurationSeconds(), request.getStatus());
         return ResponseEntity.ok().build();
     }
