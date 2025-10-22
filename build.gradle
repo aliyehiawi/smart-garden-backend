@@ -14,6 +14,9 @@ plugins {
 	id 'org.springframework.boot' version '3.5.6'
 	// Manages Spring dependency versions automatically to avoid conflicts
 	id 'io.spring.dependency-management' version '1.1.7'
+	// Static code analysis plugins
+	id 'checkstyle'  // Code style and formatting checks
+	id 'com.github.spotbugs' version '6.0.26'  // Bug pattern detection
 }
 
 // ============================================================================
@@ -152,4 +155,46 @@ task listDependencies {
 			println "${it.moduleVersion.id}"
 		}
 	}
+}
+
+// ============================================================================
+// Static Code Analysis Configuration
+// ============================================================================
+
+// Checkstyle configuration - Code style and formatting checks
+checkstyle {
+	toolVersion = '10.12.5'
+	configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+	ignoreFailures = true  // Generate reports without failing build
+	maxWarnings = 100  // Allow warnings (enforcement via pre-commit hooks)
+}
+
+// Generate HTML reports for Checkstyle
+tasks.withType(Checkstyle) {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+// SpotBugs configuration - Bug pattern detection
+spotbugs {
+	ignoreFailures = true  // Generate reports without failing build
+	effort = 'max'  // Maximum analysis effort
+	reportLevel = 'medium'  // Report medium and high priority bugs
+}
+
+// Generate HTML reports for SpotBugs
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+	reports {
+		html.required = true
+		xml.required = false
+	}
+}
+
+// Custom task: Run all code quality checks
+task codeQuality {
+	group = 'verification'
+	description = 'Runs all static code analysis tools (Checkstyle, SpotBugs)'
+	dependsOn 'checkstyleMain', 'checkstyleTest', 'spotbugsMain', 'spotbugsTest'
 }
