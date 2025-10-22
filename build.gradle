@@ -1,55 +1,155 @@
+// ============================================================================
+// Build Configuration for Smart Garden IoT Backend
+// ============================================================================
+// This Gradle build file demonstrates build automation practices:
+// - Dependency management from Maven Central
+// - Automated compilation with annotation processing
+// - Version management and packaging into executable JARs
+// - Automated testing with JUnit 5
+// ============================================================================
+
 plugins {
 	id 'java'
+	// Spring Boot plugin: Packages application as executable JAR with embedded Tomcat
 	id 'org.springframework.boot' version '3.5.6'
+	// Manages Spring dependency versions automatically to avoid conflicts
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
+// ============================================================================
+// Project Metadata
+// ============================================================================
 group = 'org.smartgarden'
 version = '0.0.1-SNAPSHOT'
-description = 'smart-garden-backend'
+description = 'IoT Smart Garden Backend - Automated irrigation system with sensor monitoring'
 
+// ============================================================================
+// Java Configuration
+// ============================================================================
 java {
 	toolchain {
+		// Requires Java 21 LTS for modern language features and performance
 		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
+// ============================================================================
+// Build Configurations
+// ============================================================================
 configurations {
 	compileOnly {
+		// Allows annotation processors to access compile-only dependencies
 		extendsFrom annotationProcessor
 	}
 }
 
+// ============================================================================
+// Dependency Management - External Libraries
+// ============================================================================
 repositories {
+	// Maven Central repository for all external dependencies
 	mavenCentral()
 }
 
 dependencies {
+	// ------------------------------------------------------------------------
+	// Spring Boot Starters - Core Framework Dependencies
+	// ------------------------------------------------------------------------
+	// RESTful API development with Spring MVC and embedded Tomcat
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// Database access layer with JPA/Hibernate for entity management
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
+	// Security framework for JWT authentication and API key validation
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	
+	// Bean validation using Jakarta Validation API (@Valid, @NotNull, etc.)
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// ------------------------------------------------------------------------
+	// Code Generation Libraries - Compile-Time Processing
+	// ------------------------------------------------------------------------
+	// Lombok: Auto-generates getters, setters, constructors, builders
+	// Reduces boilerplate code significantly
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// MapStruct: Type-safe bean mapping between DTOs and entities
+	// Generates mapping code at compile-time for better performance
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+	// ------------------------------------------------------------------------
+	// Database - Development & Testing
+	// ------------------------------------------------------------------------
+	// H2: In-memory database for development and testing
+	// Lightweight, no installation required, supports SQL console
 	runtimeOnly 'com.h2database:h2'
 
+	// ------------------------------------------------------------------------
+	// Security & Authentication - JWT Token Management
+	// ------------------------------------------------------------------------
+	// JJWT: Java JWT library for secure token-based authentication
+	// API interfaces for creating and validating JWT tokens
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	// Runtime implementation of JWT operations
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	// Jackson integration for JSON serialization in tokens
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	// ------------------------------------------------------------------------
+	// API Documentation - OpenAPI/Swagger
+	// ------------------------------------------------------------------------
+	// Springdoc: Auto-generates OpenAPI 3.0 documentation and Swagger UI
+	// Accessible at /swagger-ui.html for interactive API testing
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
+	// ------------------------------------------------------------------------
+	// Testing Framework
+	// ------------------------------------------------------------------------
+	// Spring Boot testing support (includes JUnit 5, Mockito, AssertJ)
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// Security testing utilities for authenticated endpoint testing
 	testImplementation 'org.springframework.security:spring-security-test'
+	// JUnit Platform launcher for test execution
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// ============================================================================
+// Task Configuration - Build Automation
+// ============================================================================
+
+// Test task configuration
 tasks.named('test') {
-    useJUnitPlatform()
-    onlyIf { !project.hasProperty('skipTests') }
+	// Use JUnit 5 platform for test execution
+	useJUnitPlatform()
+	// Allow skipping tests with -PskipTests flag for faster builds
+	onlyIf { !project.hasProperty('skipTests') }
+}
+
+// Custom task: Display project information
+task projectInfo {
+	group = 'help'
+	description = 'Displays project metadata and build information'
+	doLast {
+		println "=========================================="
+		println "Project: ${project.name}"
+		println "Group: ${project.group}"
+		println "Version: ${project.version}"
+		println "Description: ${project.description}"
+		println "Java Version: ${java.toolchain.languageVersion.get()}"
+		println "=========================================="
+	}
+}
+
+// Custom task: List all dependencies with versions
+task listDependencies {
+	group = 'help'
+	description = 'Lists all project dependencies'
+	doLast {
+		configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.each {
+			println "${it.moduleVersion.id}"
+		}
+	}
 }
