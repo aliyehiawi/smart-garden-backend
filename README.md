@@ -161,19 +161,32 @@ For faster builds during development:
 
 ## Testing
 
-### Run All Tests
+### Run Unit Tests
 
-Execute the full test suite with JUnit 5:
+Execute the full test suite with JUnit 5 and Mockito:
 
 ```bash
 ./gradlew test
 ```
 
-### View Test Reports
+Test reports: `build/reports/tests/test/index.html`
 
-After running tests, open the HTML report:
+### Run Code Quality Checks
 
-- Location: `build/reports/tests/test/index.html`
+Static analysis with Checkstyle and SpotBugs:
+
+```bash
+./gradlew codeQuality
+```
+
+See [STATIC_ANALYSIS.md](STATIC_ANALYSIS.md) for configuration details.
+
+### API Testing
+
+For comprehensive API testing with Postman:
+
+1. Import `Smart-Garden-API.postman_collection.json`
+2. Follow the [Testing Guide](TESTING_GUIDE.md) for step-by-step instructions
 
 ---
 
@@ -374,60 +387,13 @@ Configuration in `application.properties`:
 | GET    | `/api/v1/devices/{deviceId}/commands`                 | Poll for pump commands        |
 | POST   | `/api/v1/devices/{deviceId}/commands/{commandId}/ack` | Acknowledge command execution |
 
-### API Examples
+### Learn More
 
-**1. Login and get JWT token:**
+**For detailed usage examples**, see the [Tutorial](docs/tutorials/tutorial.md)
 
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
-```
+**For complete API reference**, visit the [Swagger UI](http://localhost:8080/swagger-ui.html)
 
-**2. Create a garden:**
-
-```bash
-TOKEN="your-jwt-token-here"
-curl -X POST http://localhost:8080/api/v1/gardens \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Garden A","description":"My tomato garden","location":"Backyard"}'
-```
-
-**3. Register an IoT device:**
-
-```bash
-curl -X POST http://localhost:8080/api/v1/devices \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"deviceId":"ESP32-001","gardenId":1}'
-# Response includes the generated API key for the device
-```
-
-**4. Device sends sensor data:**
-
-```bash
-curl -X POST http://localhost:8080/api/v1/devices/ESP32-001/data \
-  -H "X-DEVICE-KEY: your-device-api-key" \
-  -H "Content-Type: application/json" \
-  -d '{"sensorType":"SOIL_MOISTURE","value":23.4}'
-```
-
-**5. Device polls for commands:**
-
-```bash
-curl -X GET http://localhost:8080/api/v1/devices/ESP32-001/commands \
-  -H "X-DEVICE-KEY: your-device-api-key"
-```
-
-**6. Manually start pump:**
-
-```bash
-curl -X POST http://localhost:8080/api/v1/gardens/1/pump/start \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"durationSeconds":60}'
-```
+**For testing with Postman**, see the [Testing Guide](TESTING_GUIDE.md)
 
 ---
 
@@ -512,44 +478,73 @@ IoT Device ← GET commands ← API ← Retrieve pending commands
 
 ---
 
+## Documentation
+
+This project includes comprehensive documentation:
+
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [README.md](README.md) | Project overview and quick start | Everyone |
+| [Tutorial](docs/tutorials/tutorial.md) | Step-by-step learning guide | New users |
+| [Testing Guide](TESTING_GUIDE.md) | Postman collection usage | Testers |
+| [Static Analysis](STATIC_ANALYSIS.md) | Code quality tools setup | Developers |
+| [Swagger UI](http://localhost:8080/swagger-ui.html) | Complete API reference | API consumers |
+| [Javadoc](build/docs/javadoc/index.html) | Code documentation | Developers |
+
+---
+
 ## Contributing
 
 Contributions are welcome! This project was created for educational purposes.
 
-### Development Workflow
+### Quick Start for Contributors
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes
-4. Run tests and code quality checks (`./gradlew build`)
-5. Commit your changes using conventional commits
-6. Push to your branch
-7. Open a Pull Request
+4. Run quality checks: `./gradlew build codeQuality`
+5. Commit with conventional commits (see below)
+6. Push and open a Pull Request
 
-### Code Quality Standards
+### Code Quality Requirements
 
-All code must pass:
+All contributions must pass:
 
-- **Checkstyle** - Code style verification
-- **SpotBugs** - Static bug analysis
-- **Unit Tests** - Test coverage for new features
-
-Run quality checks:
+- **Checkstyle** - Code style verification  
+- **SpotBugs** - Static bug detection  
+- **Unit Tests** - Test coverage for new features  
 
 ```bash
-./gradlew codeQuality
+# Run all quality checks
+./gradlew codeQuality test
 ```
+
+See [STATIC_ANALYSIS.md](STATIC_ANALYSIS.md) for detailed guidelines.
 
 ### Commit Message Format
 
-Follow conventional commits:
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat: add new feature
-fix: resolve bug
-docs: update documentation
-test: add tests
-refactor: improve code structure
+<type>: <description>
+
+[optional body]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `test`: Adding/updating tests
+- `refactor`: Code refactoring
+- `chore`: Maintenance tasks
+
+**Examples:**
+```
+feat: add automated irrigation thresholds
+fix: resolve JWT token expiration issue
+docs: update API tutorial with examples
+test: add unit tests for UserService
 ```
 
 ---

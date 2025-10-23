@@ -1,43 +1,62 @@
-# Static Code Analysis
+# Static Code Analysis Guide
 
-This project uses automated static code analysis tools to maintain code quality and catch potential bugs early.
+This project enforces code quality through automated static analysis tools. All code must pass Checkstyle and SpotBugs checks before being committed.
 
-## Tools Used
+## Quick Reference
 
-### 1. Checkstyle
+```bash
+# Run all static analysis checks
+./gradlew codeQuality
 
-**Purpose:** Enforces Java coding standards and style consistency
+# Run specific checks
+./gradlew checkstyleMain checkstyleTest
+./gradlew spotbugsMain spotbugsTest
 
-**What it checks:**
+# View reports
+open build/reports/checkstyle/main.html
+open build/reports/spotbugs/main.html
+```
 
-- Naming conventions (classes, methods, variables)
-- Code formatting (whitespace, indentation, line length)
+---
+
+## Tools Overview
+
+### Checkstyle - Code Style Verification
+
+**Purpose:** Enforces consistent Java coding standards
+
+**Checks:**
+- Naming conventions (camelCase, PascalCase)
+- Code formatting (line length, indentation)
 - Import organization
-- Code structure and complexity
-- Common style violations
+- Cyclomatic complexity
+- Method/class length limits
 
-### 2. SpotBugs
+**Configuration:** `config/checkstyle/checkstyle.xml`
 
-**Purpose:** Detects potential bugs and code smells
+### SpotBugs - Bug Pattern Detection
 
-**What it checks:**
+**Purpose:** Identifies potential bugs and security issues
 
-- Null pointer dereferences
+**Checks:**
+- Null pointer risks
 - Resource leaks
-- Infinite loops
-- Dead code
 - Security vulnerabilities
-- Equals/hashCode violations
+- Thread safety issues
+- Performance problems
 - Incorrect API usage
 
-## Installation
+**Configuration:** `config/spotbugs/excludeFilter.xml`
 
-No installation required! The tools are configured as Gradle plugins and will be downloaded automatically on first run.
+---
+
+## Prerequisites
+
+No installation needed! Tools are configured as Gradle plugins.
 
 **Requirements:**
-
 - Java 21
-- Gradle wrapper (included in project)
+- Gradle wrapper (included)
 
 ## Running Static Analysis
 
@@ -331,3 +350,12 @@ try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 1. Check the HTML report at `build/reports/spotbugs/main.html`
 2. Review and fix the bugs
 3. Re-run `./gradlew spotbugsMain`
+
+---
+
+## Related Documentation
+
+- **[README](README.md)** - Project overview and setup
+- **[Contributing Guidelines](README.md#contributing)** - Code quality requirements for contributors
+- **[Testing Guide](TESTING_GUIDE.md)** - API testing with Postman
+- **[Tutorial](docs/tutorials/tutorial.md)** - Learn the API step-by-step
