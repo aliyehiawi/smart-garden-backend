@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.smartgarden.backend.repository.UserRepository;
 import org.smartgarden.backend.util.JwtUtil;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -57,6 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Jws<Claims> jws = jwtUtil.parseToken(token);
             String username = jws.getBody().getSubject();
             String role = (String) jws.getBody().get("role");
+            
             if (username != null && role != null 
                     && userRepository.findByUsername(username).isPresent()) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -65,9 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
                         Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                log.warn("JWT token validation failed - user not found or invalid claims: {}", 
+                        username);
             }
-        } catch (Exception ignored) {
-            // Invalid token - authentication will remain null
+        } catch (Exception e) {
+            log.warn("Failed to authenticate request - invalid or expired token");
         }
     }
 }

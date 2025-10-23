@@ -25,15 +25,18 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User createUser(String username, String password, String role) {
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new ConflictException("Username already exists");
+            log.warn("User creation failed - username already exists: {}", username);
+            throw new ConflictException("Username already exists: " + username);
         }
+        
         User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role(UserRole.valueOf(role))
                 .build();
+        
         userRepository.save(user);
-        log.info("user-created username={} role={}", username, role);
+        log.info("User created successfully - username: {}, role: {}", username, role);
         return user;
     }
 
