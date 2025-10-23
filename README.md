@@ -1,8 +1,103 @@
 # Smart Garden Backend
 
-IoT Smart Garden Backend - Automated irrigation system with sensor monitoring.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
-Spring Boot 3.5.6, Java 21 backend for Smart Garden IoT system.
+A RESTful backend API for IoT-based smart garden management, featuring automated irrigation, real-time sensor monitoring, and device management.
+
+## Overview
+
+Smart Garden Backend is a Spring Boot application that enables automated garden monitoring and irrigation control through IoT devices. The system supports multiple gardens, devices, and users with role-based access control, JWT authentication, and real-time data processing.
+
+**Key Capabilities:**
+
+- Automated irrigation based on configurable thresholds
+- Real-time sensor data collection and monitoring
+- Multi-garden and multi-device management
+- User authentication with JWT tokens
+- Device authentication with API keys
+- Historical data tracking and alerts
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Building the Project](#building-the-project)
+- [Running the Application](#running-the-application)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Database &amp; Configuration](#database--configuration)
+- [Architecture](#architecture)
+- [Technologies](#technologies)
+- [License](#license)
+
+---
+
+## Features
+
+- **User Management**
+
+  - JWT-based authentication
+  - Role-based access control (ADMIN/USER)
+  - Secure password encryption
+- **Garden Management**
+
+  - Create and manage multiple gardens
+  - Assign users to gardens
+  - Configure location and descriptions
+- **Device Management**
+
+  - Register IoT devices with unique API keys
+  - Device authentication and authorization
+  - Support for multiple devices per garden
+- **Sensor Monitoring**
+
+  - Real-time sensor data collection
+  - Support for various sensor types (soil moisture, temperature, humidity)
+  - Historical data storage and querying
+  - Time-range based data retrieval
+- **Automated Irrigation**
+
+  - Threshold-based automatic watering
+  - Manual pump control
+  - Pump activity logging
+  - Command acknowledgment system
+- **Alerts & Notifications**
+
+  - Configurable threshold alerts
+  - User-specific notifications
+  - Alert history tracking
+- **API Documentation**
+
+  - Interactive Swagger UI
+  - OpenAPI 3.0 specification
+  - Comprehensive endpoint documentation
+
+---
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/smart-garden-backend.git
+cd smart-garden-backend
+
+# Run the application
+./gradlew bootRun
+
+# Access the API
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# H2 Console: http://localhost:8080/h2-console
+```
+
+**Default credentials:**
+
+- Username: `admin`
+- Password: `admin123`
 
 ---
 
@@ -125,6 +220,31 @@ First build, then execute:
 java -jar build/libs/smart-garden-backend-0.0.1-SNAPSHOT.jar
 ```
 
+The application will start on `http://localhost:8080`
+
+---
+
+## API Documentation
+
+### Swagger UI
+
+Interactive API documentation is available at:
+
+**URL:** http://localhost:8080/swagger-ui.html
+
+The Swagger UI provides:
+
+- Complete endpoint documentation
+- Request/response schemas
+- Interactive API testing
+- Authentication support
+
+### OpenAPI Specification
+
+Raw OpenAPI 3.0 specification available at:
+
+**URL:** http://localhost:8080/v3/api-docs
+
 ---
 
 ## Dependency Management
@@ -201,51 +321,60 @@ Configuration in `application.properties`:
 - `springdoc.api-docs.enabled=true` - Swagger API docs enabled
 - `springdoc.swagger-ui.enabled=true` - Swagger UI enabled
 
-Main endpoints
+### Main API Endpoints
 
-**Authentication**
+**Authentication** (Public)
 
-- POST `/api/v1/auth/login` - Login with username/password, returns JWT token
+| Method | Endpoint               | Description                               |
+| ------ | ---------------------- | ----------------------------------------- |
+| POST   | `/api/v1/auth/login` | Login with credentials, returns JWT token |
 
 **User Management** (ADMIN only)
 
-- POST `/api/v1/users` - Create new user
-- GET `/api/v1/users` - List all users
+| Method | Endpoint          | Description     |
+| ------ | ----------------- | --------------- |
+| POST   | `/api/v1/users` | Create new user |
+| GET    | `/api/v1/users` | List all users  |
 
 **Garden Management**
 
-- POST `/api/v1/gardens` - Create garden (ADMIN)
-- GET `/api/v1/gardens` - List gardens (ADMIN/USER)
-- GET `/api/v1/gardens/{id}` - Get garden details (ADMIN/USER)
+| Method | Endpoint                 | Description        | Role       |
+| ------ | ------------------------ | ------------------ | ---------- |
+| POST   | `/api/v1/gardens`      | Create garden      | ADMIN      |
+| GET    | `/api/v1/gardens`      | List gardens       | ADMIN/USER |
+| GET    | `/api/v1/gardens/{id}` | Get garden details | ADMIN/USER |
 
-**Device Management**
+**Device Management** (ADMIN only)
 
-- POST `/api/v1/devices` - Register new IoT device (ADMIN)
+| Method | Endpoint            | Description             |
+| ------ | ------------------- | ----------------------- |
+| POST   | `/api/v1/devices` | Register new IoT device |
 
-**Threshold Configuration**
+**Irrigation Control** (ADMIN only)
 
-- PUT `/api/v1/thresholds/{gardenId}` - Set/update watering threshold (ADMIN)
-
-**Pump Control**
-
-- POST `/api/v1/gardens/{id}/pump/start` - Manually start pump (ADMIN)
-- POST `/api/v1/gardens/{id}/pump/stop` - Manually stop pump (ADMIN)
-- GET `/api/v1/pump/logs?gardenId=` - View pump activity logs (ADMIN)
+| Method | Endpoint                            | Description                   |
+| ------ | ----------------------------------- | ----------------------------- |
+| PUT    | `/api/v1/thresholds/{gardenId}`   | Set/update watering threshold |
+| POST   | `/api/v1/gardens/{id}/pump/start` | Manually start pump           |
+| POST   | `/api/v1/gardens/{id}/pump/stop`  | Manually stop pump            |
+| GET    | `/api/v1/pump/logs`               | View pump activity logs       |
 
 **Monitoring**
 
-- GET `/api/v1/gardens/{id}/sensor-data?from=&to=` - Query sensor history
-- GET `/api/v1/alerts` - Get user alerts (USER)
+| Method | Endpoint                             | Description          | Role       |
+| ------ | ------------------------------------ | -------------------- | ---------- |
+| GET    | `/api/v1/gardens/{id}/sensor-data` | Query sensor history | ADMIN/USER |
+| GET    | `/api/v1/alerts`                   | Get user alerts      | USER       |
 
-IoT Device Endpoints (API Key Authentication)
+**IoT Device Endpoints** (API Key Authentication via `X-DEVICE-KEY` header)
 
-Devices use `X-DEVICE-KEY` header for authentication:
+| Method | Endpoint                                                | Description                   |
+| ------ | ------------------------------------------------------- | ----------------------------- |
+| POST   | `/api/v1/devices/{deviceId}/data`                     | Send sensor readings          |
+| GET    | `/api/v1/devices/{deviceId}/commands`                 | Poll for pump commands        |
+| POST   | `/api/v1/devices/{deviceId}/commands/{commandId}/ack` | Acknowledge command execution |
 
-- POST `/api/v1/devices/{deviceId}/data` - Send sensor readings
-- GET `/api/v1/devices/{deviceId}/commands` - Poll for pump commands
-- POST `/api/v1/devices/{deviceId}/commands/{commandId}/ack` - Acknowledge command execution
-
-API Examples
+### API Examples
 
 **1. Login and get JWT token:**
 
@@ -300,35 +429,128 @@ curl -X POST http://localhost:8080/api/v1/gardens/1/pump/start \
   -d '{"durationSeconds":60}'
 ```
 
-Architecture
+---
 
-**Authentication:**
+## Architecture
 
-- Users: JWT token-based authentication (Bearer token)
-- IoT Devices: API key authentication (X-DEVICE-KEY header)
+### Authentication & Security
 
-**Device Communication:**
+- **User Authentication:** JWT token-based (Bearer token in Authorization header)
+- **Device Authentication:** API key-based (X-DEVICE-KEY header)
+- **Password Security:** BCrypt encryption
+- **Role-Based Access Control:** ADMIN and USER roles
 
-- Devices poll for commands every 5-10 seconds (HTTP polling)
-- Commands stored in database until acknowledged
-- No MQTT broker required - pure HTTP/REST architecture
+### Communication Pattern
 
-**Auto-Watering:**
+- **HTTP/REST API:** Pure RESTful architecture
+- **Device Polling:** Devices poll for commands every 5-10 seconds
+- **Command Storage:** Commands persisted in database until acknowledged
+- **No Message Broker:** Direct HTTP communication (no MQTT/WebSocket required)
 
-- Configure thresholds for each garden (e.g., soil moisture < 30%)
-- When threshold is breached, system automatically creates pump command
-- Device receives command on next poll and executes it
+### Automated Irrigation Flow
 
-Technologies
+1. **Threshold Configuration:** Admin sets moisture threshold (e.g., < 30%)
+2. **Data Collection:** Device sends sensor reading to API
+3. **Threshold Check:** System detects moisture below threshold
+4. **Command Creation:** Pump start command created automatically
+5. **Device Polling:** Device retrieves command on next poll
+6. **Execution:** Device activates pump and sends acknowledgment
+7. **Logging:** System records pump activity with duration and status
 
-- Spring Boot 3.5.6
-- Spring Security (JWT + API Key)
-- Spring Data JPA
-- H2 Database (in-memory for development)
-- MapStruct (DTO mapping)
-- Lombok
-- Springdoc OpenAPI (Swagger UI)
-- Java 21
+### Data Flow
+
+```
+IoT Device → POST sensor data → API → Store in DB → Check thresholds
+                                  ↓
+                           Create command (if needed)
+                                  ↓
+IoT Device ← GET commands ← API ← Retrieve pending commands
+```
+
+---
+
+## Technologies
+
+### Backend Framework
+
+- **Spring Boot 3.5.6** - Application framework
+- **Spring Security** - Authentication & authorization
+- **Spring Data JPA** - Data persistence
+- **Spring Validation** - Request validation
+
+### Database
+
+- **H2 Database** - In-memory database (development)
+- **JPA/Hibernate** - ORM framework
+
+### Security & Authentication
+
+- **JWT (JJWT 0.11.5)** - JSON Web Token implementation
+- **BCrypt** - Password hashing
+
+### Code Quality & Utilities
+
+- **Lombok** - Reduces boilerplate code
+- **MapStruct 1.5.5** - Type-safe DTO mapping
+- **Checkstyle** - Code style enforcement
+- **SpotBugs** - Static bug detection
+
+### API Documentation
+
+- **Springdoc OpenAPI 2.7.0** - OpenAPI 3.0 specification
+- **Swagger UI** - Interactive API documentation
+
+### Build & Testing
+
+- **Gradle 8.14.3** - Build automation
+- **JUnit 5** - Unit testing framework
+- **Mockito** - Mocking framework
+
+### Language
+
+- **Java 21** - LTS version with modern features
+
+---
+
+## Contributing
+
+Contributions are welcome! This project was created for educational purposes.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests and code quality checks (`./gradlew build`)
+5. Commit your changes using conventional commits
+6. Push to your branch
+7. Open a Pull Request
+
+### Code Quality Standards
+
+All code must pass:
+
+- **Checkstyle** - Code style verification
+- **SpotBugs** - Static bug analysis
+- **Unit Tests** - Test coverage for new features
+
+Run quality checks:
+
+```bash
+./gradlew codeQuality
+```
+
+### Commit Message Format
+
+Follow conventional commits:
+
+```
+feat: add new feature
+fix: resolve bug
+docs: update documentation
+test: add tests
+refactor: improve code structure
+```
 
 ---
 
