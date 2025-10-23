@@ -19,6 +19,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
+/**
+ * JWT authentication filter for Spring Security.
+ * 
+ * <p>This filter intercepts HTTP requests and validates JWT tokens
+ * from the Authorization header. If a valid token is found, the user
+ * is authenticated in the Spring Security context.
+ * 
+ * <p>The filter excludes certain paths that don't require authentication:
+ * <ul>
+ *   <li>/api/v1/auth/** - Authentication endpoints</li>
+ *   <li>/api/v1/devices/** - Device API key authentication</li>
+ *   <li>/h2-console - H2 database console</li>
+ *   <li>/swagger-ui/** - Swagger UI</li>
+ *   <li>/v3/api-docs/** - OpenAPI documentation</li>
+ * </ul>
+ * 
+ * @author Smart Garden Team
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
@@ -26,11 +46,30 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
+    /**
+     * Constructs a new JwtFilter with required dependencies.
+     * 
+     * @param jwtUtil utility for JWT operations
+     * @param userRepository repository for user validation
+     */
     public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
     }
 
+    /**
+     * Processes each HTTP request to validate JWT tokens.
+     * 
+     * <p>Extracts the JWT token from the Authorization header,
+     * validates it, and sets the authentication in the security context
+     * if valid. Excluded paths are allowed through without authentication.
+     * 
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param filterChain the filter chain to continue processing
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                      HttpServletResponse response,
@@ -53,6 +92,11 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extracts and validates JWT token, setting authentication context if valid.
+     * 
+     * @param header the Authorization header containing the Bearer token
+     */
     private void processJwtToken(String header) {
         String token = header.substring(7);
         try {

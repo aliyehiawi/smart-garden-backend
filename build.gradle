@@ -199,3 +199,49 @@ task codeQuality {
 	description = 'Runs all static code analysis tools (Checkstyle, SpotBugs)'
 	dependsOn 'checkstyleMain', 'checkstyleTest', 'spotbugsMain', 'spotbugsTest'
 }
+
+// ============================================================================
+// Javadoc Configuration
+// ============================================================================
+
+javadoc {
+	options {
+		// Set encoding to UTF-8 for proper character handling
+		encoding = 'UTF-8'
+		charSet = 'UTF-8'
+		
+		// Configure Javadoc appearance and behavior
+		author = true
+		version = true
+		use = true
+		
+		// Set window and document titles
+		windowTitle = 'Smart Garden Backend API Documentation'
+		docTitle = 'Smart Garden Backend API Documentation'
+		
+		// Add custom footer with project info
+		footer = '<i>Generated for Smart Garden IoT Backend v' + project.version + '</i>'
+		
+		// Suppress warnings for missing tags (Lombok generates some methods)
+		addStringOption('Xdoclint:none', '-quiet')
+		
+		// Add links to Java SE documentation
+		links = [
+			'https://docs.oracle.com/en/java/javase/21/docs/api/',
+			'https://docs.spring.io/spring-framework/docs/current/javadoc-api/',
+			'https://docs.spring.io/spring-boot/docs/current/api/'
+		]
+	}
+	
+	// Include source files from main source set
+	source = sourceSets.main.allJava
+	
+	// Include compiled classes in classpath
+	classpath = configurations.compileClasspath
+	
+	// Output directory for generated documentation
+	destinationDir = file("${buildDir}/docs/javadoc")
+	
+	// Fail build on Javadoc errors
+	failOnError = false
+}
