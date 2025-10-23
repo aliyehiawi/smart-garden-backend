@@ -11,7 +11,8 @@
 
 echo "Running static code analysis..."
 
-./gradlew codeQuality --console=plain
+# Force rerun to avoid Gradle cache issues with staged files
+./gradlew codeQuality --rerun-tasks --console=plain
 
 RESULT=$?
 
