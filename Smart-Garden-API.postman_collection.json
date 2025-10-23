@@ -1,0 +1,603 @@
+{
+  "info": {
+    "name": "Smart Garden API",
+    "description": "Complete API collection for Smart Garden Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "garden_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "device_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "device_api_key",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"jwt_token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. User Management",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["console.log(pm.response.json());"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password123\",\n    \"role\": \"USER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Test Invalid Role (Should return 400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"baduser\",\n    \"password\": \"password123\",\n    \"role\": \"INVALID_ROLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Test Duplicate Username (Should return 409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password123\",\n    \"role\": \"USER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Garden Management",
+      "item": [
+        {
+          "name": "Create Garden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"garden_id\", jsonData.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"My First Garden\",\n    \"description\": \"A beautiful vegetable garden\",\n    \"location\": \"Backyard\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/gardens",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "gardens"]
+            }
+          }
+        },
+        {
+          "name": "List My Gardens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/gardens",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "gardens"]
+            }
+          }
+        },
+        {
+          "name": "Get Garden by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/gardens/{{garden_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "gardens", "{{garden_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Device Management",
+      "item": [
+        {
+          "name": "Register Device",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"device_id\", jsonData.deviceId);",
+                  "pm.collectionVariables.set(\"device_api_key\", jsonData.apiKey);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"deviceId\": \"ESP32-001\",\n    \"gardenId\": {{garden_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/devices",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "devices"]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Commands (Device)",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{device_api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "X-API-KEY",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/devices/{{device_id}}/commands",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "devices", "{{device_id}}", "commands"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Threshold Management",
+      "item": [
+        {
+          "name": "Create/Update Threshold - Soil Moisture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"SOIL_MOISTURE\",\n    \"thresholdValue\": 30.0,\n    \"comparator\": \"BELOW\",\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds"]
+            }
+          }
+        },
+        {
+          "name": "Create/Update Threshold - Temperature",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"TEMP\",\n    \"thresholdValue\": 35.0,\n    \"comparator\": \"ABOVE\",\n    \"autoWaterEnabled\": false,\n    \"pumpMaxSeconds\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds"]
+            }
+          }
+        },
+        {
+          "name": "Test Invalid Sensor Type (Should return 400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"INVALID_SENSOR\",\n    \"thresholdValue\": 30.0,\n    \"comparator\": \"BELOW\",\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Sensor Data (Device API)",
+      "item": [
+        {
+          "name": "Post Sensor Reading - Soil Moisture Low (Triggers Auto-Water)",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{device_api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "X-API-KEY",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sensorType\": \"SOIL_MOISTURE\",\n    \"value\": 25.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sensors/{{device_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sensors", "{{device_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Post Sensor Reading - Temperature",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{device_api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "X-API-KEY",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sensorType\": \"TEMP\",\n    \"value\": 28.3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sensors/{{device_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sensors", "{{device_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Post Sensor Reading - Humidity",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{device_api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "X-API-KEY",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sensorType\": \"HUMIDITY\",\n    \"value\": 65.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sensors/{{device_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sensors", "{{device_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Sensor History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sensors/history/{{garden_id}}?sensorType=SOIL_MOISTURE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sensors", "history", "{{garden_id}}"],
+              "query": [
+                {
+                  "key": "sensorType",
+                  "value": "SOIL_MOISTURE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Pump Control",
+      "item": [
+        {
+          "name": "Start Pump (Manual)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"durationSeconds\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/pumps/{{garden_id}}/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pumps", "{{garden_id}}", "start"]
+            }
+          }
+        },
+        {
+          "name": "Stop Pump",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pumps/{{garden_id}}/stop",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pumps", "{{garden_id}}", "stop"]
+            }
+          }
+        },
+        {
+          "name": "Get Pump Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pumps/logs/{{garden_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pumps", "logs", "{{garden_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Alerts",
+      "item": [
+        {
+          "name": "Get Alerts for Garden",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/alerts/garden/{{garden_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "alerts", "garden", "{{garden_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Mark Alert as Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/alerts/1/read",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "alerts", "1", "read"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
