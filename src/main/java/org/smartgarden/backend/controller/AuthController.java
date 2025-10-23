@@ -19,6 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * REST controller for authentication operations.
+ * Handles user login and JWT token generation.
+ * 
+ * <p>All endpoints in this controller are publicly accessible
+ * and do not require authentication.
+ * 
+ * @author Smart Garden Team
+ * @version 1.0
+ * @since 1.0
+ */
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -28,6 +39,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Authenticates a user and returns a JWT token.
+     * 
+     * <p>This endpoint validates user credentials using Spring Security's
+     * authentication mechanism and generates a JWT token containing the
+     * user's username and role.
+     * 
+     * @param request the login request containing username and password
+     * @return ResponseEntity containing the JWT token in the response body
+     * @throws BadCredentialsException if the username or password is incorrect
+     * @throws RuntimeException if any other error occurs during authentication
+     */
     @PostMapping("/login")
     public ResponseEntity<AuthDtos.LoginResponse> login(
             @Valid @RequestBody AuthDtos.LoginRequest request) {
