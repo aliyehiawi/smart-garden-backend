@@ -165,8 +165,8 @@ task listDependencies {
 checkstyle {
 	toolVersion = '10.12.5'
 	configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-	ignoreFailures = true  // Generate reports without failing build
-	maxWarnings = 100  // Allow warnings (enforcement via pre-commit hooks)
+	ignoreFailures = false  // Fail build on violations
+	maxWarnings = 0  // Zero tolerance for warnings
 }
 
 // Generate HTML reports for Checkstyle
@@ -179,7 +179,7 @@ tasks.withType(Checkstyle) {
 
 // SpotBugs configuration - Bug pattern detection
 spotbugs {
-	ignoreFailures = true  // Generate reports without failing build
+	ignoreFailures = false  // Fail build on violations
 	effort = 'max'  // Maximum analysis effort
 	reportLevel = 'medium'  // Report medium and high priority bugs
 	excludeFilter = file("${project.rootDir}/config/spotbugs/excludeFilter.xml")
