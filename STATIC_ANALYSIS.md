@@ -71,6 +71,64 @@ Static analysis runs automatically with the standard build:
 ./gradlew check
 ```
 
+## Pre-commit Hooks
+
+Pre-commit hooks automatically run static code analysis before allowing commits, ensuring code quality is maintained.
+
+### Installation
+
+#### Option 1: Automatic Installation (Recommended)
+
+```bash
+./hooks/install-hooks.sh
+```
+
+#### Option 2: Manual Installation
+
+Copy the hook file to your local Git hooks directory:
+
+```bash
+cp hooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit  # Linux/Mac only
+```
+
+### How It Works
+
+1. When you run `git commit`, the pre-commit hook triggers automatically
+2. The hook runs `./gradlew codeQuality` to check for violations
+3. **If violations found:** Commit is blocked, and you see error reports
+4. **If no violations:** Commit proceeds normally
+
+### Example Output
+
+**Success:**
+```
+Running static code analysis...
+✅ Code quality checks passed!
+[feature/my-branch abc123] feat: add new feature
+```
+
+**Failure:**
+```
+Running static code analysis...
+❌ Code quality checks failed!
+Please fix the violations before committing.
+
+View reports:
+  - Checkstyle: build/reports/checkstyle/main.html
+  - SpotBugs:   build/reports/spotbugs/main.html
+```
+
+### Bypassing the Hook (Not Recommended)
+
+In rare cases where you need to commit despite violations:
+
+```bash
+git commit --no-verify
+```
+
+**Warning:** Only use `--no-verify` for work-in-progress commits that will be fixed before merging.
+
 ## Viewing Reports
 
 After running analysis, HTML reports are generated:
@@ -145,17 +203,33 @@ Configured in: `build.gradle`
 - Report level: Medium and High priority bugs
 - Fails build on violations
 
+**Exclude Filter:** `config/spotbugs/excludeFilter.xml`
+
+Excludes false positives for:
+- Lombok-generated code (Builder classes)
+- DTOs with intentional data exposure
+- Entity classes with JPA requirements
+- MapStruct-generated implementations
+
 ## Suppressing Violations
 
 ### Checkstyle Suppression
 
-Use `@SuppressWarnings` annotation:
+Use inline suppression comments:
 
 ```java
-@SuppressWarnings("checkstyle:MethodName")
+// CHECKSTYLE.OFF: MethodName - Reason for suppression
 public void Some_Legacy_Method() {
     // ...
 }
+// CHECKSTYLE.ON: MethodName
+```
+
+**Example from project:**
+```java
+// CHECKSTYLE.OFF: MethodName - Spring Data JPA requires underscore for nested property navigation (garden.id)
+java.util.List<Device> findByGarden_Id(Long gardenId);
+// CHECKSTYLE.ON: MethodName
 ```
 
 ### SpotBugs Suppression
@@ -176,8 +250,20 @@ public void someMethod() {
 Static analysis is integrated into the build process:
 
 1. **Local Development:** Run `./gradlew check` before committing
-2. **Pre-commit Hooks:** Automatically runs before commits (see CONTRIBUTING.md)
+2. **Pre-commit Hooks:** Automatically runs before commits (see Pre-commit Hooks section above)
 3. **CI/CD:** Runs on every pull request and merge
+
+**Recommended Workflow:**
+
+```bash
+# 1. Make code changes
+# 2. Run analysis manually
+./gradlew codeQuality
+
+# 3. Fix any violations
+# 4. Commit (hook will verify automatically)
+git commit -m "feat: add new feature"
+```
 
 ## Fixing Common Violations
 
