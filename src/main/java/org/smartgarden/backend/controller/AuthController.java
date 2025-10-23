@@ -2,12 +2,14 @@ package org.smartgarden.backend.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.smartgarden.backend.dto.AuthDtos;
 import org.smartgarden.backend.entity.User;
 import org.smartgarden.backend.repository.UserRepository;
 import org.smartgarden.backend.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -28,14 +31,34 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthDtos.LoginResponse> login(
             @Valid @RequestBody AuthDtos.LoginRequest request) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword()));
-        User user = userRepository.findByUsername(auth.getName()).orElseThrow();
-        String token = jwtUtil.generateToken(user.getUsername(), Map.of("role", user.getRole().name()));
-        AuthDtos.LoginResponse resp = new AuthDtos.LoginResponse();
-        resp.setToken(token);
-        return ResponseEntity.ok(resp);
+        log.debug("Login attempt for username: {}", request.getUsername());
+        
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(), request.getPassword()));
+            
+            User user = userRepository.findByUsername(auth.getName()).orElseThrow();
+            log.info("User authenticated successfully - username: {}, role: {}", 
+                    user.getUsername(), user.getRole());
+            
+            String token = jwtUtil.generateToken(
+                    user.getUsername(), 
+                    Map.of("role", user.getRole().name()));
+            
+            AuthDtos.LoginResponse resp = new AuthDtos.LoginResponse();
+            resp.setToken(token);
+            return ResponseEntity.ok(resp);
+            
+        } catch (BadCredentialsException e) {
+            log.warn("Failed login attempt - invalid credentials for username: {}", 
+                    request.getUsername());
+            throw e;
+        } catch (Exception e) {
+            log.error("Login error for username: {} - {}", 
+                    request.getUsername(), e.getMessage(), e);
+            throw e;
+        }
     }
 }
 
