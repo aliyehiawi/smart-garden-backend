@@ -3,7 +3,7 @@ package org.smartgarden.backend.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.smartgarden.backend.dto.ThresholdDtos;
-import org.smartgarden.backend.entity.Threshold;
+import org.smartgarden.backend.mapper.ThresholdMapper;
 import org.smartgarden.backend.service.ThresholdService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,12 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ThresholdController {
     private final ThresholdService thresholdService;
+    private final ThresholdMapper thresholdMapper;
 
     @PutMapping("/{gardenId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Threshold> update(@PathVariable Long gardenId, @Valid @RequestBody ThresholdDtos.ThresholdRequest req) {
+    public ResponseEntity<ThresholdDtos.ThresholdResponse> update(
+            @PathVariable Long gardenId,
+            @Valid @RequestBody ThresholdDtos.ThresholdRequest req) {
         req.setGardenId(gardenId);
-        return ResponseEntity.ok(thresholdService.upsertThreshold(req));
+        return ResponseEntity.ok(thresholdMapper.toResponse(thresholdService.upsertThreshold(req)));
     }
 }
 

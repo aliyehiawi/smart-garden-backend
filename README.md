@@ -62,7 +62,8 @@ Smart Garden Backend is a Spring Boot application that enables automated garden 
   - Time-range based data retrieval
 - **Automated Irrigation**
 
-  - Threshold-based automatic watering
+  - Hysteresis-based automatic watering with min/max thresholds
+  - Prevents pump cycling (start when below min, stop when reaching max)
   - Manual pump control
   - Pump activity logging
   - Command acknowledgment system
@@ -415,13 +416,19 @@ Configuration in `application.properties`:
 
 ### Automated Irrigation Flow
 
-1. **Threshold Configuration:** Admin sets moisture threshold (e.g., < 30%)
-2. **Data Collection:** Device sends sensor reading to API
-3. **Threshold Check:** System detects moisture below threshold
-4. **Command Creation:** Pump start command created automatically
-5. **Device Polling:** Device retrieves command on next poll
-6. **Execution:** Device activates pump and sends acknowledgment
+The system uses **hysteresis control** with min/max thresholds to prevent rapid pump cycling:
+
+1. **Threshold Configuration:** Admin sets min/max thresholds (e.g., min: 30%, max: 70%)
+2. **Data Collection:** Device sends sensor reading to API every 10-30 seconds
+3. **Threshold Check:** System evaluates sensor data:
+   - If moisture < **minThreshold** AND pump OFF → Start pump
+   - If moisture ≥ **maxThreshold** AND pump ON → Stop pump
+4. **Command Creation:** Pump command (START/STOP) created automatically
+5. **Device Polling:** Device retrieves command on next poll (every 5-10 seconds)
+6. **Execution:** Device activates/deactivates pump and sends acknowledgment
 7. **Logging:** System records pump activity with duration and status
+
+**Why Min/Max?** This prevents the pump from rapidly turning on/off. Once started at 30%, it runs until moisture reaches 70%, providing stable operation.
 
 ### Data Flow
 

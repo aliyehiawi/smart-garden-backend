@@ -161,8 +161,10 @@ Application runs at: `http://localhost:8080`
 **Request**: `5. Threshold Management → Create/Update Threshold - Soil Moisture`
 
 **What it does**:
-- Sets auto-watering rules
-- When soil moisture < 30%, automatically start pump for 30 seconds
+- Sets auto-watering rules with hysteresis control
+- Start pump when soil moisture < 30% (min threshold)
+- Stop pump when soil moisture ≥ 70% (max threshold)
+- Prevents rapid on/off cycling
 
 **Expected Response** (200 OK):
 ```json
@@ -170,16 +172,22 @@ Application runs at: `http://localhost:8080`
   "id": 1,
   "gardenId": 1,
   "sensorType": "SOIL_MOISTURE",
-  "thresholdValue": 30.0,
-  "comparator": "BELOW",
+  "minThresholdValue": 30.0,
+  "maxThresholdValue": 70.0,
   "autoWaterEnabled": true,
-  "pumpMaxSeconds": 30
+  "pumpMaxSeconds": 300
 }
 ```
+
+**Key Points**:
+- `minThresholdValue`: Pump starts when value drops below this
+- `maxThresholdValue`: Pump stops when value reaches this
+- `pumpMaxSeconds`: Safety limit (max pump runtime)
 
 **Also test**:
 - `Create/Update Threshold - Temperature`
 - `Test Invalid Sensor Type (Should return 400)` → Validates enum
+- `Test Min >= Max (Should return 400)` → Validates threshold range
 
 ---
 
@@ -437,11 +445,14 @@ SELECT * FROM THRESHOLD;
 - `403 Forbidden` → No permission
 - `401 Unauthorized` → Not logged in
 
-### Auto-Watering Logic
-1. Set threshold (soil moisture < 30%, auto-water ON)
-2. Post sensor reading with value 25%
-3. Check logs → Should see auto-watering triggered
+### Auto-Watering Logic (Hysteresis Control)
+1. Set thresholds (min: 30%, max: 70%, auto-water ON)
+2. Post sensor reading with value 25% (below min)
+3. Check logs → Should see auto-watering START triggered
 4. Check pending commands → Should see START command
+5. Post sensor reading with value 72% (above max)
+6. Check logs → Should see auto-watering STOP triggered
+7. Check pending commands → Should see STOP command
 
 ### Device Authentication
 - Device endpoints use API key (not JWT)
@@ -472,10 +483,12 @@ SELECT * FROM THRESHOLD;
 2. Create User
 3. Create Garden → Saves garden_id
 4. Register Device → Saves device_id & api_key
-5. Set Threshold (Soil < 30%, auto-water)
-6. Post Sensor Data (25%) → Triggers auto-watering
+5. Set Threshold (min: 30%, max: 70%, auto-water ON)
+6. Post Sensor Data (25%) → Triggers auto-watering START
 7. Get Pending Commands → See pump START command
-8. Get Pump Logs → See AUTO pump log
+8. Post Sensor Data (72%) → Triggers auto-watering STOP
+9. Get Pending Commands → See pump STOP command
+10. Get Pump Logs → See AUTO pump logs
 9. Start Pump (Manual)
 10. Get Sensor History
 11. View Alerts

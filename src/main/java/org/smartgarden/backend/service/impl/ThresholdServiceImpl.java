@@ -2,7 +2,6 @@ package org.smartgarden.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.smartgarden.backend.dto.ThresholdDtos;
-import org.smartgarden.backend.entity.ComparatorType;
 import org.smartgarden.backend.entity.Garden;
 import org.smartgarden.backend.entity.SensorType;
 import org.smartgarden.backend.entity.Threshold;
@@ -25,12 +24,15 @@ public class ThresholdServiceImpl implements ThresholdService {
     public Threshold upsertThreshold(ThresholdDtos.ThresholdRequest request) {
         Garden garden = gardenRepository.findById(request.getGardenId()).orElseThrow(() -> new NotFoundException("Garden not found"));
         SensorType sensorType = SensorType.valueOf(request.getSensorType());
-        ComparatorType comparatorType = ComparatorType.valueOf(request.getComparator());
+        
+        if (request.getMinThresholdValue() >= request.getMaxThresholdValue()) {
+            throw new IllegalArgumentException("minThresholdValue must be less than maxThresholdValue");
+        }
         
         Threshold threshold = thresholdRepository.findByGardenAndSensorType(garden, sensorType)
                 .orElse(Threshold.builder().garden(garden).sensorType(sensorType).build());
-        threshold.setThresholdValue(request.getThresholdValue());
-        threshold.setComparator(comparatorType);
+        threshold.setMinThresholdValue(request.getMinThresholdValue());
+        threshold.setMaxThresholdValue(request.getMaxThresholdValue());
         threshold.setAutoWaterEnabled(Boolean.TRUE.equals(request.getAutoWaterEnabled()));
         threshold.setPumpMaxSeconds(request.getPumpMaxSeconds() != null ? request.getPumpMaxSeconds() : 60);
         return thresholdRepository.save(threshold);

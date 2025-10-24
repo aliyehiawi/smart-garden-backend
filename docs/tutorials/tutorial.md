@@ -201,32 +201,59 @@ curl -X POST http://localhost:8080/api/v1/devices/1/data \
 
 ## Setting Up Automated Irrigation
 
-This is where the magic happens! The system can automatically turn on your garden pump when soil moisture drops below a threshold.
+This is where the magic happens! The system uses **hysteresis control** with min/max thresholds to automatically manage your garden pump.
 
-### How It Works
+### How It Works (Hysteresis Control)
 
-1. **You set a threshold** (e.g., "turn on pump when soil moisture < 30%")
-2. **Device sends sensor data** every few seconds
-3. **System checks threshold** - Is moisture below 30%?
-4. **If yes, create pump command** automatically
-5. **Device polls for commands** and receives the "START_PUMP" command
-6. **Device activates pump** and sends acknowledgment
-7. **System logs the activity**
+The system uses two thresholds to prevent rapid on/off cycling:
 
-### Step 1: Configure Threshold
+1. **You set min/max thresholds** (e.g., min: 30%, max: 70%)
+2. **Device sends sensor data** every 10-30 seconds
+3. **System checks thresholds:**
+   - Moisture < 30% AND pump OFF? → **Start pump**
+   - Moisture ≥ 70% AND pump ON? → **Stop pump**
+   - Between 30-70%? → **No change** (prevents cycling)
+4. **Device polls for commands** and receives START or STOP commands
+5. **Device executes command** and sends acknowledgment
+6. **System logs the activity**
+
+**Why two thresholds?** Imagine moisture at 29%:
+- ❌ **Bad (single threshold):** Pump starts → moisture hits 31% → pump stops → drops to 29% → pump starts again (rapid cycling!)
+- ✅ **Good (min/max):** Pump starts at 29% → runs until 70% → stops → won't restart until back to 30% (stable operation)
+
+### Step 1: Configure Min/Max Thresholds
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/thresholds/1 \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
+    "gardenId": 1,
     "sensorType": "SOIL_MOISTURE",
-    "comparator": "LESS_THAN",
-    "value": 30.0
+    "minThresholdValue": 30.0,
+    "maxThresholdValue": 70.0,
+    "autoWaterEnabled": true,
+    "pumpMaxSeconds": 300
   }'
 ```
 
-This says: "When soil moisture is **less than 30%**, start the pump automatically."
+**Response:**
+```json
+{
+  "id": 1,
+  "gardenId": 1,
+  "sensorType": "SOIL_MOISTURE",
+  "minThresholdValue": 30.0,
+  "maxThresholdValue": 70.0,
+  "autoWaterEnabled": true,
+  "pumpMaxSeconds": 300
+}
+```
+
+**What this means:**
+- Start pump when moisture drops **below 30%**
+- Stop pump when moisture reaches **70%** or higher
+- Maximum safety duration: 300 seconds (5 minutes)
 
 ### Step 2: Device Sends Sensor Data
 
@@ -243,9 +270,11 @@ curl -X POST http://localhost:8080/api/v1/devices/1/data \
 ```
 
 **What happens:**
-- Moisture is 25% (below the 30% threshold)
+- Moisture is 25% (below the 30% minimum threshold)
+- System checks: Is pump currently running? NO
 - System automatically creates a "START_PUMP" command
 - Command is stored in the database, waiting for the device
+- Pump will continue running until moisture reaches 70% (max threshold)
 
 ### Step 3: Device Polls for Commands
 
