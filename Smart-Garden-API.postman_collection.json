@@ -370,6 +370,51 @@
               "path": ["api", "v1", "thresholds", "{{garden_id}}"]
             }
           }
+        },
+        {
+          "name": "Get All Thresholds for Garden",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds", "{{garden_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Threshold by Sensor Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}/SOIL_MOISTURE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds", "{{garden_id}}", "SOIL_MOISTURE"]
+            }
+          }
+        },
+        {
+          "name": "Test Min >= Max (Should return 400)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"SOIL_MOISTURE\",\n    \"minThresholdValue\": 70.0,\n    \"maxThresholdValue\": 30.0,\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "thresholds", "{{garden_id}}"]
+            }
+          }
         }
       ]
     },

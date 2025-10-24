@@ -364,14 +364,21 @@ Configuration in `application.properties`:
 | ------ | ------------------- | ----------------------- |
 | POST   | `/api/v1/devices` | Register new IoT device |
 
-**Irrigation Control** (ADMIN only)
+**Threshold Management**
 
-| Method | Endpoint                            | Description                   |
-| ------ | ----------------------------------- | ----------------------------- |
-| PUT    | `/api/v1/thresholds/{gardenId}`   | Set/update watering threshold |
-| POST   | `/api/v1/gardens/{id}/pump/start` | Manually start pump           |
-| POST   | `/api/v1/gardens/{id}/pump/stop`  | Manually stop pump            |
-| GET    | `/api/v1/pump/logs`               | View pump activity logs       |
+| Method | Endpoint                                        | Description                      | Role       |
+| ------ | ----------------------------------------------- | -------------------------------- | ---------- |
+| PUT    | `/api/v1/thresholds/{gardenId}`               | Set/update watering threshold    | ADMIN      |
+| GET    | `/api/v1/thresholds/{gardenId}`               | Get all thresholds for garden    | ADMIN/USER |
+| GET    | `/api/v1/thresholds/{gardenId}/{sensorType}` | Get specific threshold           | ADMIN/USER |
+
+**Pump Control** (ADMIN only)
+
+| Method | Endpoint                            | Description          |
+| ------ | ----------------------------------- | -------------------- |
+| POST   | `/api/v1/pumps/{gardenId}/start`  | Manually start pump  |
+| POST   | `/api/v1/pumps/{gardenId}/stop`   | Manually stop pump   |
+| GET    | `/api/v1/pumps/logs/{gardenId}`   | View pump logs       |
 
 **Monitoring**
 

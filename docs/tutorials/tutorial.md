@@ -223,6 +223,7 @@ The system uses two thresholds to prevent rapid on/off cycling:
 
 ### Step 1: Configure Min/Max Thresholds
 
+**Set or update threshold:**
 ```bash
 curl -X PUT http://localhost:8080/api/v1/thresholds/1 \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -248,6 +249,33 @@ curl -X PUT http://localhost:8080/api/v1/thresholds/1 \
   "autoWaterEnabled": true,
   "pumpMaxSeconds": 300
 }
+```
+
+**Retrieve all thresholds for your garden:**
+```bash
+curl http://localhost:8080/api/v1/thresholds/1 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "gardenId": 1,
+    "sensorType": "SOIL_MOISTURE",
+    "minThresholdValue": 30.0,
+    "maxThresholdValue": 70.0,
+    "autoWaterEnabled": true,
+    "pumpMaxSeconds": 300
+  }
+]
+```
+
+**Get specific threshold by sensor type:**
+```bash
+curl http://localhost:8080/api/v1/thresholds/1/SOIL_MOISTURE \
+  -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 **What this means:**
