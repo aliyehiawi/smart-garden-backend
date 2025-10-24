@@ -33,11 +33,10 @@ public class Threshold {
     private SensorType sensorType;
 
     @Column(nullable = false)
-    private Double thresholdValue;
+    private Double minThresholdValue;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private ComparatorType comparator;
+    @Column(nullable = false)
+    private Double maxThresholdValue;
 
     @Column(nullable = false)
     private boolean autoWaterEnabled;

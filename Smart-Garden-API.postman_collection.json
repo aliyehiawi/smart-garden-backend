@@ -311,11 +311,11 @@
         {
           "name": "Create/Update Threshold - Soil Moisture",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"SOIL_MOISTURE\",\n    \"thresholdValue\": 30.0,\n    \"comparator\": \"BELOW\",\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"SOIL_MOISTURE\",\n    \"minThresholdValue\": 30.0,\n    \"maxThresholdValue\": 70.0,\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 300\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -323,20 +323,20 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/thresholds",
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "thresholds"]
+              "path": ["api", "v1", "thresholds", "{{garden_id}}"]
             }
           }
         },
         {
           "name": "Create/Update Threshold - Temperature",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"TEMP\",\n    \"thresholdValue\": 35.0,\n    \"comparator\": \"ABOVE\",\n    \"autoWaterEnabled\": false,\n    \"pumpMaxSeconds\": 20\n}",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"TEMP\",\n    \"minThresholdValue\": 35.0,\n    \"maxThresholdValue\": 45.0,\n    \"autoWaterEnabled\": false,\n    \"pumpMaxSeconds\": 20\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -344,20 +344,20 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/thresholds",
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "thresholds"]
+              "path": ["api", "v1", "thresholds", "{{garden_id}}"]
             }
           }
         },
         {
           "name": "Test Invalid Sensor Type (Should return 400)",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"INVALID_SENSOR\",\n    \"thresholdValue\": 30.0,\n    \"comparator\": \"BELOW\",\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
+              "raw": "{\n    \"gardenId\": {{garden_id}},\n    \"sensorType\": \"INVALID_SENSOR\",\n    \"minThresholdValue\": 30.0,\n    \"maxThresholdValue\": 70.0,\n    \"autoWaterEnabled\": true,\n    \"pumpMaxSeconds\": 30\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -365,9 +365,9 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/v1/thresholds",
+              "raw": "{{base_url}}/api/v1/thresholds/{{garden_id}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "thresholds"]
+              "path": ["api", "v1", "thresholds", "{{garden_id}}"]
             }
           }
         }
